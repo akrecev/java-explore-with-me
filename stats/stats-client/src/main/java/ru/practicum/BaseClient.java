@@ -1,12 +1,11 @@
 package ru.practicum;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 public class BaseClient {
@@ -16,48 +15,66 @@ public class BaseClient {
         this.rest = rest;
     }
 
-
-    protected ResponseEntity<Object> get(String path, @Nullable Map<String, Object> parameters) {
-        return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
+    protected ResponseEntity<List<ViewStatsDto>> get(String path, Map<String, Object> parameters) {
+        return makeAndSendRequestGet(path, parameters);
     }
 
     protected <T> ResponseEntity<Object> post(String path, T body) {
-        return post(path, null, body);
+        return makeAndSendRequest(path, body);
     }
 
-    protected <T> ResponseEntity<Object> post(String path, @Nullable Map<String, Object> parameters, T body) {
-        return makeAndSendRequest(HttpMethod.POST, path, parameters, body);
-    }
-
-    private <T> ResponseEntity<Object> makeAndSendRequest(
-            HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body
-    ) {
+    private <T> ResponseEntity<Object> makeAndSendRequest(String path, T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body);
-
-        ResponseEntity<Object> statsServerResponse;
+        ResponseEntity<Object> statsResponse;
         try {
-            if (parameters != null) {
-                statsServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
-            } else {
-                statsServerResponse = rest.exchange(path, method, requestEntity, Object.class);
-            }
+            statsResponse = rest.exchange(path, HttpMethod.POST, requestEntity, Object.class);
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
-        return prepareResponse(statsServerResponse);
+        return prepareGatewayResponse(statsResponse);
     }
 
-    private static ResponseEntity<Object> prepareResponse(ResponseEntity<Object> response) {
+    private <T> ResponseEntity<List<ViewStatsDto>> makeAndSendRequestGet(String path,
+                                                                      Map<String, Object> parameters) {
+
+        HttpEntity<T> requestEntity = new HttpEntity<>(defaultHeaders());
+        ResponseEntity<List<ViewStatsDto>> statsResponse;
+        try {
+            statsResponse = rest.exchange(path, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<>() {},
+                    parameters);
+        } catch (HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        }
+        return prepareGatewayResponseGet(statsResponse);
+    }
+
+    private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }
-
         ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-
         if (response.hasBody()) {
             return responseBuilder.body(response.getBody());
         }
 
         return responseBuilder.build();
+    }
+
+    private static ResponseEntity<List<ViewStatsDto>> prepareGatewayResponseGet(ResponseEntity<List<ViewStatsDto>> response) {
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return response;
+        }
+        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
+        if (response.hasBody()) {
+            return responseBuilder.body(response.getBody());
+        }
+        return responseBuilder.build();
+    }
+
+    private HttpHeaders defaultHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        return headers;
     }
 }

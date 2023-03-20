@@ -10,6 +10,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -37,7 +38,7 @@ public class StatsClient extends BaseClient {
         return post("/hit", hitDto);
     }
 
-    public ResponseEntity<Object> getByBooker(String start, String end, String uris, Boolean unique) {
+    public ResponseEntity<List<ViewStatsDto>> getByBooker(String start, String end, String uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
