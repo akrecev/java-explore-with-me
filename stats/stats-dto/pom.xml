@@ -36,6 +36,7 @@
             <artifactId>jackson-annotations</artifactId>
             <version>2.13.5</version>
         </dependency>
+
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>

@@ -37,6 +37,7 @@ public class StatsServiceImpl implements StatsService {
         if (uris == null || uris.isEmpty()) {
             return result;
         }
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime startTime = LocalDateTime.parse(start, formatter);
         LocalDateTime endTime = LocalDateTime.parse(end, formatter);
