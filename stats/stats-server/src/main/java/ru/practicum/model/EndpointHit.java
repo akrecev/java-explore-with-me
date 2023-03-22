@@ -20,7 +20,7 @@ public class EndpointHit {
     private Long id;
     @Column(nullable = false, length = 100)
     private String app;
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 2048)
     private String uri;
     @Column(nullable = false, length = 20)
     private String ip;
