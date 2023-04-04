@@ -11,6 +11,7 @@ import ru.practicum.repository.StatsRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 import static ru.practicum.mapper.EndpointHitMapper.toEndpointHit;
 import static ru.practicum.mapper.EndpointHitMapper.toEndpointHitDto;
@@ -37,10 +38,18 @@ public class StatsServiceImpl implements StatsService {
         LocalDateTime startTime = LocalDateTime.parse(start, formatter);
         LocalDateTime endTime = LocalDateTime.parse(end, formatter);
 
-        if (unique) {
-            result = statsRepository.getStatsUnique(startTime, endTime, uris);
+        if (Objects.nonNull(uris)) {
+            if (unique) {
+                result = statsRepository.getStatsUniqueWithUris(startTime, endTime, uris);
+            } else {
+                result = statsRepository.getStatsWithUris(startTime, endTime, uris);
+            }
         } else {
-            result = statsRepository.getStats(startTime, endTime, uris);
+            if (unique) {
+                result = statsRepository.getStatsUnique(startTime, endTime);
+            } else {
+                result = statsRepository.getStats(startTime, endTime);
+            }
         }
 
         return result;
