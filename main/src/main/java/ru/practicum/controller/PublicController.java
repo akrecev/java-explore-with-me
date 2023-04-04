@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.servise.CategoryService;
+import ru.practicum.compilation.dto.CompilationDto;
+import ru.practicum.compilation.service.CompilationService;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.service.EventService;
@@ -26,6 +28,7 @@ import java.util.List;
 public class PublicController {
     private final CategoryService categoryService;
     private final EventService eventService;
+    private final CompilationService compilationService;
 
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDto>> getAllCategories(
@@ -69,6 +72,23 @@ public class PublicController {
         log.info("Get event id={}", id);
 
         return ResponseEntity.ok(eventService.getById(id, request));
+    }
+
+    @GetMapping("/compilations")
+    public ResponseEntity<List<CompilationDto>> getAllCompilations(
+            @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) {
+        log.info("Get compilations");
+
+        return ResponseEntity.ok(compilationService.getAll(from, size));
+    }
+
+    @GetMapping("/compilations/{compId}")
+    public ResponseEntity<CompilationDto> getCompilationById(@Positive @PathVariable Long compId) {
+        log.info("Get compilation id={}", compId);
+
+        return ResponseEntity.ok(compilationService.getById(compId));
     }
 
 }

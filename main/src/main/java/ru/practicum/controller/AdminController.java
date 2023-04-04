@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.dto.NewCategoryDto;
 import ru.practicum.category.servise.CategoryService;
+import ru.practicum.compilation.dto.CompilationDto;
+import ru.practicum.compilation.dto.NewCompilationDto;
+import ru.practicum.compilation.dto.UpdateCompilationRequest;
+import ru.practicum.compilation.service.CompilationService;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.UpdateEventAdminRequest;
 import ru.practicum.event.service.EventService;
@@ -30,6 +34,7 @@ public class AdminController {
     private final UserService userService;
     private final CategoryService categoryService;
     private final EventService eventService;
+    private final CompilationService compilationService;
 
     @PostMapping("/users")
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody NewUserRequest newUserRequest) {
@@ -72,8 +77,7 @@ public class AdminController {
             @Valid @RequestBody CategoryDto categoryDto
     ) {
         log.info("Update category {}", categoryDto);
-        return ResponseEntity
-                .ok(categoryService.update(catId, categoryDto));
+        return ResponseEntity.ok(categoryService.update(catId, categoryDto));
     }
 
     @DeleteMapping("/categories/{catId}")
@@ -111,4 +115,28 @@ public class AdminController {
         return ResponseEntity.ok(eventService.updateEventByAdmin(eventId, updateEvent));
     }
 
+    @PostMapping("/compilations")
+    public ResponseEntity<CompilationDto> createCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto) {
+        log.info("Create compilation {}", newCompilationDto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(compilationService.create(newCompilationDto));
+    }
+
+    @PatchMapping("/compilations/{compId}")
+    public ResponseEntity<CompilationDto> updateCompilation(
+            @Positive @PathVariable Long compId,
+            @Valid @RequestBody UpdateCompilationRequest compilationRequest
+    ) {
+        log.info("Update compilation {}", compilationRequest);
+        return ResponseEntity.ok(compilationService.update(compId, compilationRequest));
+    }
+
+    @DeleteMapping("/compilations/{compId}")
+    public ResponseEntity<Void> deleteCompilationById(@Positive @PathVariable Long compId) {
+        compilationService.deleteById(compId);
+        log.info("Delete compilation id={}", compId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
