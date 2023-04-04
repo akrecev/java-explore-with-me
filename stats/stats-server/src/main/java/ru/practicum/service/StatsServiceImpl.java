@@ -10,7 +10,6 @@ import ru.practicum.repository.StatsRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 
 import static ru.practicum.mapper.EndpointHitMapper.toEndpointHit;
@@ -32,11 +31,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStatsDto> get(String start, String end, List<String> uris, Boolean unique) {
-        List<ViewStatsDto> result = Collections.emptyList();
-
-        if (uris == null || uris.isEmpty()) {
-            return result;
-        }
+        List<ViewStatsDto> result;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime startTime = LocalDateTime.parse(start, formatter);
