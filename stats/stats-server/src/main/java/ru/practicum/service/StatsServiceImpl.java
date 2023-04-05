@@ -38,13 +38,11 @@ public class StatsServiceImpl implements StatsService {
         LocalDateTime endTime = LocalDateTime.parse(end, formatter);
 
         if (Objects.isNull(uris) || uris.isEmpty()) {
-            {
                 if (unique) {
                     result = statsRepository.getStatsUnique(startTime, endTime);
                 } else {
                     result = statsRepository.getStats(startTime, endTime);
                 }
-            }
         } else {
             if (unique) {
                 result = statsRepository.getStatsUniqueWithUris(startTime, endTime, uris);
