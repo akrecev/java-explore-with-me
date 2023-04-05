@@ -8,5 +8,5 @@ import java.util.List;
 public interface StatsService {
     EndpointHitDto create(EndpointHitDto hitDto);
 
-    List<ViewStatsDto> get(String start, String end, List<String> uris, Boolean unique);
+    List<ViewStatsDto> get(String start, String end, List<String> uris, boolean unique);
 }

@@ -152,7 +152,7 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
 
         EndpointHitDto hitDto = EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())
@@ -192,7 +192,7 @@ public class EventServiceImpl implements EventService {
         }
 
         EndpointHitDto hitDto = EndpointHitDto.builder()
-                .app("ewm-service")
+                .app("ewm-main-service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())

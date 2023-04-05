@@ -31,24 +31,25 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<ViewStatsDto> get(String start, String end, List<String> uris, Boolean unique) {
+    public List<ViewStatsDto> get(String start, String end, List<String> uris, boolean unique) {
         List<ViewStatsDto> result;
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime startTime = LocalDateTime.parse(start, formatter);
         LocalDateTime endTime = LocalDateTime.parse(end, formatter);
 
-        if (Objects.nonNull(uris)) {
+        if (Objects.isNull(uris) || uris.isEmpty()) {
+            {
+                if (unique) {
+                    result = statsRepository.getStatsUnique(startTime, endTime);
+                } else {
+                    result = statsRepository.getStats(startTime, endTime);
+                }
+            }
+        } else {
             if (unique) {
                 result = statsRepository.getStatsUniqueWithUris(startTime, endTime, uris);
             } else {
                 result = statsRepository.getStatsWithUris(startTime, endTime, uris);
-            }
-        } else {
-            if (unique) {
-                result = statsRepository.getStatsUnique(startTime, endTime);
-            } else {
-                result = statsRepository.getStats(startTime, endTime);
             }
         }
 
