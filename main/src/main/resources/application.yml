@@ -49,5 +49,7 @@ spring:
     password: test
   h2:
     console.enabled: true
+stats-server:
+  url: http://localhost:9090
 
 

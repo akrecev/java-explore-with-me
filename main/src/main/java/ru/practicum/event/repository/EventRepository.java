@@ -25,8 +25,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "WHERE (e.state = :state) " +
             "AND (UPPER(e.annotation) LIKE UPPER(CONCAT('%', :text, '%')) " +
             "OR UPPER(e.description) LIKE UPPER(CONCAT('%', :text, '%'))) " +
-            "AND (:categories IS NULL OR e.category IN :categories) " +
-            "AND (:paid IS NULL OR e.paid = :paid) " +
+            "AND (e.category IN :categories OR :categories IS NULL) " +
+            "AND (e.paid = :paid OR :paid IS NULL ) " +
             "AND (e.eventDate BETWEEN :start AND :end) " +
             "ORDER BY e.eventDate")
     Page<Event> search(
