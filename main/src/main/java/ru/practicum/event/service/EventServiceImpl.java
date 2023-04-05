@@ -161,18 +161,7 @@ public class EventServiceImpl implements EventService {
         statsClient.hit(hitDto);
 
         for (EventShortDto eventShortDto : eventsList) {
-            Long views = 0L;
-            List<ViewStatsDto> viewStatsDtoList = statsClient.stats(
-                    LocalDateTime.now().minusYears(100L).format(Formatter.TIME_FORMATTER),
-                    LocalDateTime.now().plusYears(100L).format(Formatter.TIME_FORMATTER),
-                    "/events/" + eventShortDto.getId(),
-                    false
-            );
-
-            if (viewStatsDtoList.size() != 0) {
-                views = viewStatsDtoList.get(0).getHits();
-            }
-            eventShortDto.setViews(views);
+            setViews(eventShortDto);
         }
 
         if (sort.equals("VIEWS")) {
@@ -200,18 +189,7 @@ public class EventServiceImpl implements EventService {
 
         statsClient.hit(hitDto);
         EventFullDto eventFullDto = toEventFullDto(event);
-        Long views = 0L;
-        List<ViewStatsDto> viewStatsDtoList = statsClient.stats(
-                LocalDateTime.now().minusYears(100L).format(Formatter.TIME_FORMATTER),
-                LocalDateTime.now().plusYears(100L).format(Formatter.TIME_FORMATTER),
-                "/events/" + eventFullDto.getId(),
-                false
-        );
-
-        if (viewStatsDtoList.size() != 0) {
-            views = viewStatsDtoList.get(0).getHits();
-        }
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
         eventFullDto.setConfirmedRequests(countConfirmedRequests(id));
 
         return eventFullDto;
@@ -219,7 +197,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
+    public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventRequest updateRequest) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
 
@@ -230,23 +208,7 @@ public class EventServiceImpl implements EventService {
             throw new ConflictException("Only pending or canceled events can be changed");
         }
 
-        updateAnnotation(updateRequest.getAnnotation(), event);
-
-        updateCategory(updateRequest.getCategory(), event);
-
-        updateTitle(updateRequest.getTitle(), event);
-
-        updateDescription(updateRequest.getDescription(), event);
-
-        updateEventDate(updateRequest.getEventDate(), event);
-
-        updateLocation(updateRequest.getLocation(), event);
-
-        updatePaid(updateRequest.getPaid(), event);
-
-        updateParticipantLimit(updateRequest.getParticipantLimit(), event);
-
-        updateRequestModeration(updateRequest.getRequestModeration(), event);
+        updateEvent(updateRequest, event);
 
         if (!Objects.isNull(updateRequest.getStateAction())) {
             if (updateRequest.getStateAction().equals(StateAction.SEND_TO_REVIEW.toString())) {
@@ -264,27 +226,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest updateRequest) {
+    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateRequest) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
 
-        updateAnnotation(updateRequest.getAnnotation(), event);
-
-        updateCategory(updateRequest.getCategory(), event);
-
-        updateTitle(updateRequest.getTitle(), event);
-
-        updateDescription(updateRequest.getDescription(), event);
-
-        updateEventDate(updateRequest.getEventDate(), event);
-
-        updateLocation(updateRequest.getLocation(), event);
-
-        updatePaid(updateRequest.getPaid(), event);
-
-        updateParticipantLimit(updateRequest.getParticipantLimit(), event);
-
-        updateRequestModeration(updateRequest.getRequestModeration(), event);
+        updateEvent(updateRequest, event);
 
         if (!Objects.isNull(updateRequest.getStateAction())) {
             if (updateRequest.getStateAction().equals(StateAction.PUBLISH_EVENT.toString())) {
@@ -412,6 +358,41 @@ public class EventServiceImpl implements EventService {
         EventFullDto eventFullDto = toEventFullDto(event);
         eventFullDto.setConfirmedRequests(countConfirmedRequests(event.getId()));
         return eventFullDto;
+    }
+
+    private <T extends EventDto> void setViews(T eventDto) {
+        Long views = 0L;
+        List<ViewStatsDto> viewStatsDtoList = statsClient.stats(
+                LocalDateTime.now().minusYears(100L).format(Formatter.TIME_FORMATTER),
+                LocalDateTime.now().plusYears(100L).format(Formatter.TIME_FORMATTER),
+                "/events/" + eventDto.getId(),
+                false
+        );
+
+        if (viewStatsDtoList.size() != 0) {
+            views = viewStatsDtoList.get(0).getHits();
+        }
+        eventDto.setViews(views);
+    }
+
+    private void updateEvent(UpdateEventRequest updateRequest, Event event) {
+        updateAnnotation(updateRequest.getAnnotation(), event);
+
+        updateCategory(updateRequest.getCategory(), event);
+
+        updateTitle(updateRequest.getTitle(), event);
+
+        updateDescription(updateRequest.getDescription(), event);
+
+        updateEventDate(updateRequest.getEventDate(), event);
+
+        updateLocation(updateRequest.getLocation(), event);
+
+        updatePaid(updateRequest.getPaid(), event);
+
+        updateParticipantLimit(updateRequest.getParticipantLimit(), event);
+
+        updateRequestModeration(updateRequest.getRequestModeration(), event);
     }
 
 }

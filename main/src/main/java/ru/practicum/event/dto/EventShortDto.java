@@ -9,8 +9,7 @@ import ru.practicum.user.dto.UserShortDto;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EventShortDto {
-    private Long id;
+public class EventShortDto extends EventDto {
 
     private String annotation;
 
@@ -25,7 +24,5 @@ public class EventShortDto {
     private String eventDate; // Дата и время на которые намечено событие (в формате "yyyy-MM-dd HH:mm:ss")
 
     private Boolean paid; // Нужно ли оплачивать участие
-
-    private Long views; // Количество просмотрев события
 
 }

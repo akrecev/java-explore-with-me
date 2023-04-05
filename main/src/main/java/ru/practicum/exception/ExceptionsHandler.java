@@ -25,12 +25,6 @@ public class ExceptionsHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleBadRequest(final BadRequest badRequest) {
-        return badRequest(badRequest);
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleBadRequest(final MethodArgumentNotValidException validException) {
         return badRequest(validException);
     }
@@ -70,21 +64,6 @@ public class ExceptionsHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .reason("The required object was not found.")
                 .message(notFoundException.getMessage())
-                .timestamp(LocalDateTime.now().format(Formatter.TIME_FORMATTER))
-                .build();
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ApiError handleForbidden(final ForbiddenException forbiddenException) {
-        log.warn("403 {}", forbiddenException.getMessage());
-        forbiddenException.printStackTrace(printWriter);
-
-        return ApiError.builder()
-                .errors(Collections.singletonList(stringWriter.toString()))
-                .status(HttpStatus.FORBIDDEN)
-                .reason("For the requested operation the conditions are not met.")
-                .message(forbiddenException.getMessage())
                 .timestamp(LocalDateTime.now().format(Formatter.TIME_FORMATTER))
                 .build();
     }

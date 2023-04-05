@@ -10,8 +10,7 @@ import ru.practicum.user.dto.UserShortDto;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EventFullDto {
-    private Long id;
+public class EventFullDto extends EventDto {
 
     private String annotation;
 
@@ -40,7 +39,5 @@ public class EventFullDto {
     private Long participantLimit; // Ограничение на количество участников. Default 0 - отсутствие ограничения
 
     private Boolean requestModeration; // Нужна ли пре-модерация заявок на участие
-
-    private Long views; // Количество просмотрев события
 
 }

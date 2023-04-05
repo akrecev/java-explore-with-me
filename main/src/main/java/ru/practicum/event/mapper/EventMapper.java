@@ -16,8 +16,7 @@ public class EventMapper {
     }
 
     public static EventFullDto toEventFullDto(Event event) {
-        return new EventFullDto(
-                event.getId(),
+        EventFullDto eventFullDto = new EventFullDto(
                 event.getAnnotation(),
                 CategoryMapper.toCategoryDto(event.getCategory()),
                 event.getTitle(),
@@ -31,23 +30,26 @@ public class EventMapper {
                 event.getLocation(),
                 event.getPaid(),
                 event.getParticipantLimit(),
-                event.getRequestModeration(),
-                event.getViews()
+                event.getRequestModeration()
         );
+        eventFullDto.setId(event.getId());
+
+        return eventFullDto;
     }
 
     public static EventShortDto toEventShortDto(Event event) {
-        return new EventShortDto(
-                event.getId(),
+        EventShortDto eventShortDto = new EventShortDto(
                 event.getAnnotation(),
                 CategoryMapper.toCategoryDto(event.getCategory()),
                 event.getTitle(),
                 UserMapper.toUserShortDto(event.getInitiator()),
                 0L,
                 event.getEventDate().format(Formatter.TIME_FORMATTER),
-                event.getPaid(),
-                event.getViews()
+                event.getPaid()
         );
+        eventShortDto.setId(event.getId());
+
+        return eventShortDto;
     }
 
     public static Event toEvent(NewEventDto newEventDto) {

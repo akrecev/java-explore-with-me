@@ -14,7 +14,7 @@ import ru.practicum.compilation.dto.NewCompilationDto;
 import ru.practicum.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.compilation.service.CompilationService;
 import ru.practicum.event.dto.EventFullDto;
-import ru.practicum.event.dto.UpdateEventAdminRequest;
+import ru.practicum.event.dto.UpdateEventRequest;
 import ru.practicum.event.service.EventService;
 import ru.practicum.user.dto.NewUserRequest;
 import ru.practicum.user.dto.UserDto;
@@ -108,7 +108,7 @@ public class AdminController {
     @PatchMapping("/events/{eventId}")
     public ResponseEntity<EventFullDto> updateEventByAdmin(
             @Positive @PathVariable Long eventId,
-            @RequestBody UpdateEventAdminRequest updateEvent
+            @RequestBody UpdateEventRequest updateEvent
     ) {
         log.info("Update event id={} by admin", eventId);
 

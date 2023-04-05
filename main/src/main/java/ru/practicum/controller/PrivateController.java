@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
-import ru.practicum.event.dto.UpdateEventUserRequest;
+import ru.practicum.event.dto.UpdateEventRequest;
 import ru.practicum.event.service.EventService;
 import ru.practicum.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.request.dto.EventRequestStatusUpdateResult;
@@ -66,7 +66,7 @@ public class PrivateController {
     public ResponseEntity<EventFullDto> updateEventByUser(
             @Positive @PathVariable Long userId,
             @Positive @PathVariable Long eventId,
-            @Valid @RequestBody UpdateEventUserRequest updateEvent
+            @Valid @RequestBody UpdateEventRequest updateEvent
     ) {
         log.info("Update event id={} by user id={}", eventId, userId);
 
