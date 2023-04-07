@@ -1,52 +1,46 @@
 package ru.practicum;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Service
-public class StatsClient extends BaseClient {
+public class StatsClient {
 
-    @Autowired
-    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
-        super(
-                builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build()
-        );
-    }
+    private final WebClient webClient;
 
-    public ResponseEntity<Object> create(HttpServletRequest request) {
-
-        EndpointHitDto hitDto = EndpointHitDto.builder()
-                .app("ewm-service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now())
+    public StatsClient(@Value("${stats-server.url}") String serverUrl) {
+        webClient = WebClient.builder()
+                .baseUrl(serverUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
-
-        return post("/hit", hitDto);
     }
 
-    public ResponseEntity<List<ViewStatsDto>> getByBooker(String start, String end, String uris, Boolean unique) {
-        Map<String, Object> parameters = Map.of(
-                "start", start,
-                "end", end,
-                "uris", uris,
-                "unique", unique
-        );
-
-        return get("?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+    public void hit(EndpointHitDto hitDto) {
+        webClient.post()
+                .uri("/hit")
+                .bodyValue(hitDto)
+                .retrieve()
+                .bodyToMono(EndpointHitDto.class)
+                .block();
     }
 
+    public List<ViewStatsDto> stats(String start, String end, String uris, Boolean unique) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/stats")
+                        .queryParam("start", start)
+                        .queryParam("end", end)
+                        .queryParam("uris", uris)
+                        .queryParam("unique", unique)
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<ViewStatsDto>>() {
+                })
+                .block();
+    }
 }

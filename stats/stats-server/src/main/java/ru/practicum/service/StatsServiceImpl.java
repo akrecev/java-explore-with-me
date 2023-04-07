@@ -10,8 +10,8 @@ import ru.practicum.repository.StatsRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static ru.practicum.mapper.EndpointHitMapper.toEndpointHit;
 import static ru.practicum.mapper.EndpointHitMapper.toEndpointHitDto;
@@ -31,21 +31,24 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<ViewStatsDto> get(String start, String end, List<String> uris, Boolean unique) {
-        List<ViewStatsDto> result = Collections.emptyList();
-
-        if (uris == null || uris.isEmpty()) {
-            return result;
-        }
-
+    public List<ViewStatsDto> get(String start, String end, List<String> uris, boolean unique) {
+        List<ViewStatsDto> result;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime startTime = LocalDateTime.parse(start, formatter);
         LocalDateTime endTime = LocalDateTime.parse(end, formatter);
 
-        if (unique) {
-            result = statsRepository.getStatsUnique(startTime, endTime, uris);
+        if (Objects.isNull(uris) || uris.isEmpty()) {
+                if (unique) {
+                    result = statsRepository.getStatsUnique(startTime, endTime);
+                } else {
+                    result = statsRepository.getStats(startTime, endTime);
+                }
         } else {
-            result = statsRepository.getStats(startTime, endTime, uris);
+            if (unique) {
+                result = statsRepository.getStatsUniqueWithUris(startTime, endTime, uris);
+            } else {
+                result = statsRepository.getStatsWithUris(startTime, endTime, uris);
+            }
         }
 
         return result;
