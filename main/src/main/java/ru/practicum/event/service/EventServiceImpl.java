@@ -12,7 +12,6 @@ import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.mapper.EventMapper;
 import ru.practicum.event.model.Event;
-import ru.practicum.event.model.Location;
 import ru.practicum.event.model.State;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.exception.ConflictException;
@@ -269,66 +268,6 @@ public class EventServiceImpl implements EventService {
         return start;
     }
 
-    private static void updateAnnotation(String updateRequest, Event event) {
-        if (updateRequest != null && !updateRequest.equals(event.getAnnotation())) {
-            event.setAnnotation(updateRequest);
-        }
-    }
-
-    private static void updateTitle(String updateRequest, Event event) {
-        if (updateRequest != null && !updateRequest.equals(event.getTitle())) {
-            event.setTitle(updateRequest);
-        }
-    }
-
-    private static void updateDescription(String updateRequest, Event event) {
-        if (updateRequest != null && !updateRequest.equals(event.getDescription())) {
-            event.setDescription(updateRequest);
-        }
-    }
-
-    private static void updateEventDate(String updateRequest, Event event) {
-        if (updateRequest != null) {
-            LocalDateTime eventDate = LocalDateTime.parse(updateRequest, Formatter.TIME_FORMATTER);
-
-            if (!eventDate.equals(event.getEventDate())) {
-                if (eventDate.isBefore(LocalDateTime.now().plusHours(2L))) {
-                    throw new ConflictException(
-                            "Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value:"
-                                    + eventDate
-                    );
-                }
-                event.setEventDate(eventDate);
-            }
-        }
-    }
-
-    private static void updateLocation(Location updateRequest, Event event) {
-        if (updateRequest != null && !updateRequest.equals(event.getLocation())) {
-            event.setLocation(updateRequest);
-        }
-    }
-
-    private static void updatePaid(Boolean updateRequest, Event event) {
-        if (updateRequest != null && !updateRequest.equals(event.getPaid())) {
-            event.setPaid(updateRequest);
-        }
-    }
-
-    private static void updateParticipantLimit(Long updateRequest, Event event) {
-        if (updateRequest != null
-                && !updateRequest.equals(event.getParticipantLimit())) {
-            event.setParticipantLimit(updateRequest);
-        }
-    }
-
-    private static void updateRequestModeration(Boolean updateRequest, Event event) {
-        if (updateRequest != null
-                && !updateRequest.equals(event.getRequestModeration())) {
-            event.setRequestModeration(updateRequest);
-        }
-    }
-
     private List<Category> prepareCategories(List<Long> categories) {
         List<Category> categoriesList;
         if (Objects.nonNull(categories)) {
@@ -337,17 +276,6 @@ public class EventServiceImpl implements EventService {
             categoriesList = categoryRepository.findAll();
         }
         return categoriesList;
-    }
-
-    private void updateCategory(Long updateRequest, Event event) {
-        if (updateRequest != null
-                && !updateRequest.equals(event.getCategory().getId())) {
-            event.setCategory(categoryRepository
-                    .findById(updateRequest).orElseThrow(
-                            () -> new DataNotFoundException(
-                                    "Category with id=" + updateRequest + " was not found"
-                            )));
-        }
     }
 
     private Long countConfirmedRequests(Long eventId) {
@@ -376,23 +304,59 @@ public class EventServiceImpl implements EventService {
     }
 
     private void updateEvent(UpdateEventRequest updateRequest, Event event) {
-        updateAnnotation(updateRequest.getAnnotation(), event);
 
-        updateCategory(updateRequest.getCategory(), event);
+        if (updateRequest.getAnnotation() != null && !updateRequest.getAnnotation().equals(event.getAnnotation())) {
+            event.setAnnotation(updateRequest.getAnnotation());
+        }
 
-        updateTitle(updateRequest.getTitle(), event);
+        if (updateRequest.getCategory() != null
+                && !updateRequest.getCategory().equals(event.getCategory().getId())) {
+            event.setCategory(categoryRepository
+                    .findById(updateRequest.getCategory()).orElseThrow(
+                            () -> new DataNotFoundException(
+                                    "Category with id=" + updateRequest.getCategory() + " was not found"
+                            )));
+        }
 
-        updateDescription(updateRequest.getDescription(), event);
+        if (updateRequest.getTitle() != null && !updateRequest.getTitle().equals(event.getTitle())) {
+            event.setTitle(updateRequest.getTitle());
+        }
 
-        updateEventDate(updateRequest.getEventDate(), event);
+        if (updateRequest.getDescription() != null && !updateRequest.getDescription().equals(event.getDescription())) {
+            event.setDescription(updateRequest.getDescription());
+        }
 
-        updateLocation(updateRequest.getLocation(), event);
+        if (updateRequest.getEventDate() != null) {
+            LocalDateTime eventDate = LocalDateTime.parse(updateRequest.getEventDate(), Formatter.TIME_FORMATTER);
 
-        updatePaid(updateRequest.getPaid(), event);
+            if (!eventDate.equals(event.getEventDate())) {
+                if (eventDate.isBefore(LocalDateTime.now().plusHours(2L))) {
+                    throw new ConflictException(
+                            "Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value:"
+                                    + eventDate
+                    );
+                }
+                event.setEventDate(eventDate);
+            }
+        }
 
-        updateParticipantLimit(updateRequest.getParticipantLimit(), event);
+        if (updateRequest.getLocation() != null && !updateRequest.getLocation().equals(event.getLocation())) {
+            event.setLocation(updateRequest.getLocation());
+        }
 
-        updateRequestModeration(updateRequest.getRequestModeration(), event);
+        if (updateRequest.getPaid() != null && !updateRequest.getPaid().equals(event.getPaid())) {
+            event.setPaid(updateRequest.getPaid());
+        }
+
+        if (updateRequest.getParticipantLimit() != null
+                && !updateRequest.getParticipantLimit().equals(event.getParticipantLimit())) {
+            event.setParticipantLimit(updateRequest.getParticipantLimit());
+        }
+
+        if (updateRequest.getRequestModeration() != null
+                && !updateRequest.getRequestModeration().equals(event.getRequestModeration())) {
+            event.setRequestModeration(updateRequest.getRequestModeration());
+        }
     }
 
 }

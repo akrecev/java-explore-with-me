@@ -25,6 +25,12 @@ public class ExceptionsHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleBadRequest(final BadRequestException badRequestException) {
+        return badRequest(badRequestException);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleBadRequest(final MethodArgumentNotValidException validException) {
         return badRequest(validException);
     }
