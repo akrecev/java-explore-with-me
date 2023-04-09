@@ -19,44 +19,45 @@ import java.util.Collections;
 @RestControllerAdvice
 @Slf4j
 public class ExceptionsHandler {
-
     StringWriter stringWriter = new StringWriter();
     PrintWriter printWriter = new PrintWriter(stringWriter);
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            BadRequestException.class,
+            MethodArgumentNotValidException.class,
+            MethodArgumentTypeMismatchException.class,
+            MissingServletRequestParameterException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleBadRequest(final BadRequestException badRequestException) {
-        return badRequest(badRequestException);
+    public ApiError handleBadRequest(final Exception ex) {
+        log.error("400 {}", ex.getMessage());
+        ex.printStackTrace(printWriter);
+
+        return ApiError.builder()
+                .errors(Collections.singletonList(stringWriter.toString()))
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("Incorrectly made request.")
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now().format(Formatter.TIME_FORMATTER))
+                .build();
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleBadRequest(final MethodArgumentNotValidException validException) {
-        return badRequest(validException);
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleBadRequest(final MethodArgumentTypeMismatchException mismatchException) {
-        return badRequest(mismatchException);
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleBadRequest(final MissingServletRequestParameterException missingParameterException) {
-        return badRequest(missingParameterException);
-    }
-
-    @ExceptionHandler
+    @ExceptionHandler({
+            ConflictException.class,
+            DataIntegrityViolationException.class
+    })
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleConflict(final ConflictException conflictException) {
-        return conflict(conflictException);
-    }
+    public ApiError handleConflict(final Exception ex) {
+        log.error("409 {}", ex.getMessage());
+        ex.printStackTrace(printWriter);
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleConflict(final DataIntegrityViolationException violationException) {
-        return conflict(violationException);
+        return ApiError.builder()
+                .errors(Collections.singletonList(stringWriter.toString()))
+                .status(HttpStatus.CONFLICT)
+                .reason("Integrity constraint has been violated.")
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now().format(Formatter.TIME_FORMATTER))
+                .build();
     }
 
     @ExceptionHandler
@@ -88,31 +89,4 @@ public class ExceptionsHandler {
                 .timestamp(LocalDateTime.now().format(Formatter.TIME_FORMATTER))
                 .build();
     }
-
-    private ApiError badRequest(final Exception e) {
-        log.error("400 {}", e.getMessage());
-        e.printStackTrace(printWriter);
-
-        return ApiError.builder()
-                .errors(Collections.singletonList(stringWriter.toString()))
-                .status(HttpStatus.BAD_REQUEST)
-                .reason("Incorrectly made request.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now().format(Formatter.TIME_FORMATTER))
-                .build();
-    }
-
-    private ApiError conflict(final Exception e) {
-        log.error("409 {}", e.getMessage());
-        e.printStackTrace(printWriter);
-
-        return ApiError.builder()
-                .errors(Collections.singletonList(stringWriter.toString()))
-                .status(HttpStatus.CONFLICT)
-                .reason("Integrity constraint has been violated.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now().format(Formatter.TIME_FORMATTER))
-                .build();
-    }
-
 }

@@ -147,7 +147,7 @@ public class PrivateController {
     ) {
         log.info("Get comments by user id={}", userId);
 
-        return ResponseEntity.ok(commentService.getAllCommentsByUser(userId, from, size));
+        return ResponseEntity.ok(commentService.getAllByUser(userId, from, size));
     }
 
     @GetMapping("/{userId}/comments/{commentId}")
@@ -157,7 +157,7 @@ public class PrivateController {
     ) {
         log.info("Get comment id={} by user id={}", commentId, userId);
 
-        return ResponseEntity.ok(commentService.getCommentById(userId, commentId));
+        return ResponseEntity.ok(commentService.getById(userId, commentId));
     }
 
     @PatchMapping("/{userId}/comments/{commentId}")
@@ -168,7 +168,7 @@ public class PrivateController {
     ) {
         log.info("Update comment id={} by user id={}", commentId, userId);
 
-        return ResponseEntity.ok(commentService.updateCommentByUser(userId, commentId, updateComment));
+        return ResponseEntity.ok(commentService.update(userId, commentId, updateComment));
     }
 
     @DeleteMapping("/{userId}/comments/{commentId}")
@@ -176,7 +176,7 @@ public class PrivateController {
             @Positive @PathVariable Long userId,
             @Positive @PathVariable Long commentId
     ) {
-        commentService.deleteCommentByUser(userId, commentId);
+        commentService.deleteByUser(userId, commentId);
         log.info("Delete comment id={} by user id={}", commentId, userId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

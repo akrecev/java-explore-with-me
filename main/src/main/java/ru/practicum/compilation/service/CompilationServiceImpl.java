@@ -42,7 +42,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     public CompilationDto update(Long compId, UpdateCompilationRequest compilationRequest) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new DataNotFoundException("Compilation with id=" + compId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Compilation", compId));
 
         if (compilationRequest.getEvents() != null) {
             compilation.setEvents(eventRepository.findAllById(compilationRequest.getEvents()));
@@ -64,7 +64,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     public void deleteById(Long compId) {
         compilationRepository.findById(compId)
-                .orElseThrow(() -> new DataNotFoundException("Compilation with id=" + compId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Compilation", compId));
 
         compilationRepository.deleteById(compId);
     }
@@ -79,7 +79,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto getById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new DataNotFoundException("Compilation with id=" + compId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Compilation", compId));
 
         return toCompilationDto(compilation);
     }

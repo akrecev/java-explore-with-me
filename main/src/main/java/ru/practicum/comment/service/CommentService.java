@@ -8,15 +8,15 @@ import java.util.List;
 public interface CommentService {
     CommentDto create(Long userId, Long eventId, CommentDto newComment);
 
-    List<CommentDto> getAllCommentsByUser(Long userId, Integer from, Integer size);
+    List<CommentDto> getAllByUser(Long userId, Integer from, Integer size);
 
-    List<CommentDto> getAllCommentsByEvent(Long eventId, Integer from, Integer size);
+    List<CommentDto> getAllByEvent(Long eventId, Integer from, Integer size);
 
-    List<CommentPublicDto> getAllCommentsByEventPublic(Long eventId, Integer from, Integer size);
+    List<CommentPublicDto> getAllByEventPublic(Long eventId, Integer from, Integer size);
 
-    CommentDto getCommentById(Long userId, Long commentId);
+    CommentDto getById(Long userId, Long commentId);
 
-    CommentDto updateCommentByUser(Long userId, Long commentId, CommentDto updateComment);
+    CommentDto update(Long userId, Long commentId, CommentDto updateComment);
 
-    void deleteCommentByUser(Long userId, Long commentId);
+    void deleteByUser(Long userId, Long commentId);
 }

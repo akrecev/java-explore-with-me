@@ -151,7 +151,7 @@ public class AdminController {
     ) {
         log.info("Get comments by user id={} for admin", userId);
 
-        return ResponseEntity.ok(commentService.getAllCommentsByUser(userId, from, size));
+        return ResponseEntity.ok(commentService.getAllByUser(userId, from, size));
     }
 
     @GetMapping("/comments/{eventId}")
@@ -162,7 +162,7 @@ public class AdminController {
     ) {
         log.info("Get comments by event id={} for admin", eventId);
 
-        return ResponseEntity.ok(commentService.getAllCommentsByEvent(eventId, from, size));
+        return ResponseEntity.ok(commentService.getAllByEvent(eventId, from, size));
     }
 
     @DeleteMapping("/comments/{commentId}")

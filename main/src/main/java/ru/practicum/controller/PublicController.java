@@ -102,7 +102,7 @@ public class PublicController {
     ) {
         log.info("Get comments by event id={} for public", id);
 
-        return ResponseEntity.ok(commentService.getAllCommentsByEventPublic(id, from, size));
+        return ResponseEntity.ok(commentService.getAllByEventPublic(id, from, size));
     }
 
 }

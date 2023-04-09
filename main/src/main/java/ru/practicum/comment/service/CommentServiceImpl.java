@@ -38,13 +38,9 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public CommentDto create(Long userId, Long eventId, CommentDto newComment) {
         User commentator = userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException(
-                        "User with id=" + userId + " was not found"
-                ));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataNotFoundException(
-                        "Event with id=" + newComment.getEventId() + " was not found"
-                ));
+                .orElseThrow(() -> new DataNotFoundException("Event", newComment.getEventId()));
 
         if (!event.getState().equals(State.PUBLISHED)) {
             throw new BadRequestException("Event id=" + eventId + " was not published");
@@ -56,9 +52,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> getAllCommentsByUser(Long userId, Integer from, Integer size) {
+    public List<CommentDto> getAllByUser(Long userId, Integer from, Integer size) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
 
         return commentRepository.findCommentsByCommentatorId(userId, new MyPageRequest(from, size))
                 .stream()
@@ -67,9 +63,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> getAllCommentsByEvent(Long eventId, Integer from, Integer size) {
+    public List<CommentDto> getAllByEvent(Long eventId, Integer from, Integer size) {
         eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Event", eventId));
 
         return commentRepository.findCommentsByEventId(eventId, new MyPageRequest(from, size))
                 .stream()
@@ -78,9 +74,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentPublicDto> getAllCommentsByEventPublic(Long eventId, Integer from, Integer size) {
+    public List<CommentPublicDto> getAllByEventPublic(Long eventId, Integer from, Integer size) {
         eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Event", eventId));
 
         return commentRepository.findCommentsByEventId(eventId, new MyPageRequest(from, size))
                 .stream()
@@ -89,26 +85,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto getCommentById(Long userId, Long commentId) {
+    public CommentDto getById(Long userId, Long commentId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new DataNotFoundException("Comment with id=" + commentId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Comment", commentId));
 
         return toCommentDto(comment);
     }
 
     @Override
-    public CommentDto updateCommentByUser(Long userId, Long commentId, CommentDto updateCommentDto) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
-
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new DataNotFoundException("Comment with id=" + commentId + " was not found"));
-
-        if (!comment.getCommentator().getId().equals(userId)) {
-            throw new ConflictException("User id=" + userId + " is not owner by comment id=" + commentId);
-        }
+    public CommentDto update(Long userId, Long commentId, CommentDto updateCommentDto) {
+        Comment comment = getComment(userId, commentId);
 
         if (updateCommentDto.getDescription() != null
                 && !updateCommentDto.getDescription().equals(comment.getDescription())) {
@@ -123,17 +111,22 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void deleteCommentByUser(Long userId, Long commentId) {
+    public void deleteByUser(Long userId, Long commentId) {
+        getComment(userId, commentId);
+
+        commentRepository.deleteById(commentId);
+    }
+
+    private Comment getComment(Long userId, Long commentId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new DataNotFoundException("Comment with id=" + commentId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Comment", commentId));
 
         if (!comment.getCommentator().getId().equals(userId)) {
             throw new ConflictException("User id=" + userId + " is not owner by comment id=" + commentId);
         }
-
-        commentRepository.deleteById(commentId);
+        return comment;
     }
 }
