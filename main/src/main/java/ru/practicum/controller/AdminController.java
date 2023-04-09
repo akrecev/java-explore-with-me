@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.dto.NewCategoryDto;
 import ru.practicum.category.servise.CategoryService;
+import ru.practicum.comment.dto.CommentDto;
+import ru.practicum.comment.service.CommentService;
 import ru.practicum.compilation.dto.CompilationDto;
 import ru.practicum.compilation.dto.NewCompilationDto;
 import ru.practicum.compilation.dto.UpdateCompilationRequest;
@@ -35,6 +37,7 @@ public class AdminController {
     private final CategoryService categoryService;
     private final EventService eventService;
     private final CompilationService compilationService;
+    private final CommentService commentService;
 
     @PostMapping("/users")
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody NewUserRequest newUserRequest) {
@@ -136,6 +139,36 @@ public class AdminController {
     public ResponseEntity<Void> deleteCompilationById(@Positive @PathVariable Long compId) {
         compilationService.deleteById(compId);
         log.info("Delete compilation id={}", compId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/comments/{userId}")
+    public ResponseEntity<List<CommentDto>> getAllCommentsByUserForAdmin(
+            @Positive @PathVariable Long userId,
+            @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) {
+        log.info("Get comments by user id={} for admin", userId);
+
+        return ResponseEntity.ok(commentService.getAllByUser(userId, from, size));
+    }
+
+    @GetMapping("/comments/{eventId}")
+    public ResponseEntity<List<CommentDto>> getAllCommentsByEventForAdmin(
+            @Positive @PathVariable Long eventId,
+            @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) {
+        log.info("Get comments by event id={} for admin", eventId);
+
+        return ResponseEntity.ok(commentService.getAllByEvent(eventId, from, size));
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteCommentById(@Positive @PathVariable Long commentId) {
+        compilationService.deleteById(commentId);
+        log.info("Delete comment id={} by admin", commentId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

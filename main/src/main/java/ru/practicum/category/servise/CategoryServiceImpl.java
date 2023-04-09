@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto update(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new DataNotFoundException("Category with id=" + catId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Category", catId));
 
         if (categoryDto.getName() != null && !categoryDto.getName().equals(category.getName())) {
             category.setName(categoryDto.getName());
@@ -50,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteById(Long catId) {
         categoryRepository.findById(catId)
-                .orElseThrow(() -> new DataNotFoundException("Category with id=" + catId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Category", catId));
 
         categoryRepository.deleteById(catId);
     }
@@ -66,7 +66,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getById(Long catId) {
         Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new DataNotFoundException("Category with id=" + catId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Category", catId));
 
         return toCategoryDto(category);
     }

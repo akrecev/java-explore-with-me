@@ -37,10 +37,10 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto create(Long userId, Long eventId) {
         User requester = userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
 
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Event", eventId));
 
         if (userId.equals(event.getInitiator().getId())) {
             throw new ConflictException("User id=" + userId + " is initiator by event id=" + eventId);
@@ -76,7 +76,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<ParticipationRequestDto> getAllRequestsByUser(Long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
 
         List<Request> requestList = requestRepository.findAllByRequesterId(userId);
 
@@ -88,10 +88,10 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<ParticipationRequestDto> getRequestsByEvent(Long userId, Long eventId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
 
         eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Event", eventId));
 
         List<Request> requestList = requestRepository.findAllByEventInitiatorIdAndEventId(userId, eventId);
 
@@ -104,10 +104,10 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto canselRequestByUser(Long userId, Long requestId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
 
         Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new DataNotFoundException("Request with id=" + requestId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Request", requestId));
         request.setStatus(RequestStatus.CANCELED);
 
         Request rejectedRequest = requestRepository.save(request);
@@ -121,9 +121,9 @@ public class RequestServiceImpl implements RequestService {
             Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequests
     ) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataNotFoundException("Event with id=" + eventId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("Event", eventId));
 
         if (requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED)
                 >= event.getParticipantLimit()) {

@@ -1,2 +1,7 @@
 # java-explore-with-me
-Template repository for ExploreWithMe project.
+# Дипломный проект
+#
+
+Приложение — афиша. В этой афише можно предложить какое-либо событие от выставки до похода в кино и собрать компанию для участия в нём.
+
+https://github.com/akrecev/java-explore-with-me/pull/6

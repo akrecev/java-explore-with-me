@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.servise.CategoryService;
+import ru.practicum.comment.dto.CommentPublicDto;
+import ru.practicum.comment.service.CommentService;
 import ru.practicum.compilation.dto.CompilationDto;
 import ru.practicum.compilation.service.CompilationService;
 import ru.practicum.event.dto.EventFullDto;
@@ -29,6 +31,7 @@ public class PublicController {
     private final CategoryService categoryService;
     private final EventService eventService;
     private final CompilationService compilationService;
+    private final CommentService commentService;
 
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDto>> getAllCategories(
@@ -89,6 +92,17 @@ public class PublicController {
         log.info("Get compilation id={}", compId);
 
         return ResponseEntity.ok(compilationService.getById(compId));
+    }
+
+    @GetMapping("/events/{id}/comments")
+    public ResponseEntity<List<CommentPublicDto>> getAllCommentsByEventPublic(
+            @Positive @PathVariable Long id,
+            @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) {
+        log.info("Get comments by event id={} for public", id);
+
+        return ResponseEntity.ok(commentService.getAllByEventPublic(id, from, size));
     }
 
 }

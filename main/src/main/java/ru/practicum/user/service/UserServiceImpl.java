@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteById(Long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new DataNotFoundException("User", userId));
 
         userRepository.deleteById(userId);
     }
