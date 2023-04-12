@@ -20,3 +20,7 @@ Java 11 / Spring Boot / Maven / PostgreSQL / H2 / Docker / Postman
 [Postman collections](./postman)
 
 [Link to the final PR](https://github.com/akrecev/java-explore-with-me/pull/6)
+
+[MainServer.java](./main/src/main/java/ru/practicum/MainServer.java)
+
+[StatsServer.java](./stats/stats-server/src/main/java/ru/practicum/StatsServer.java)
